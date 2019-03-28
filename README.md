@@ -1,3 +1,7 @@
+# Progress So Far
+
+<img src="Progress_GIF/man_city[Home].gif">
+      
 This project was bootstrapped with [Create React Routes](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
