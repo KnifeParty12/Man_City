@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Fade from 'react-reveal/Fade';
 import FormField from '../../ui/formFields'
 import {validate} from '../../ui/misc';
+import {firebasePromotions} from "../../../firebase";
 
 class Enroll extends Component {
 
@@ -47,6 +48,32 @@ class Enroll extends Component {
         })
     }
 
+    resetFormSuccess(type){
+        const newFormdata = {...this.state.formdata};
+
+        for(let key in newFormdata){
+            newFormdata[key].value = '';
+            newFormdata[key].valid =false;
+            newFormdata[key].validationMessage ='';
+
+        }
+
+        this.setState({
+            formError:false,
+            formData: newFormdata,
+            formSuccess: type ? 'Congratulations' : 'Already on the database'
+        });
+         this.successMessage();
+    }
+
+
+    successMessage(){
+        setTimeout(()=>{
+            this.setState({
+                formSuccess:''
+            })
+        },2000)
+    }
 
     submitForm(event){
         event.preventDefault();
@@ -60,7 +87,19 @@ class Enroll extends Component {
         }
 
         if(formIsValid){
-            console.log(dataToSubmit);
+            firebasePromotions.orderByChild('email').equalTo(dataToSubmit.email).once("value")
+                .then((snapshot)=> {
+                if(snapshot.val()===null){
+                    firebasePromotions.push(dataToSubmit);
+                    this.resetFormSuccess(true);
+                }else{
+                    this.resetFormSuccess(false);
+                }
+                })
+
+
+
+            //this.resetFormSuccess();
 
         }else{
             this.setState({
@@ -91,8 +130,15 @@ class Enroll extends Component {
                                 <div className={"error_label"}>
                                 Something is wrong,try again.
                                 </div>
-                                :null}
+                                :null
+                            }
+                            <div className={"success_label"}>{this.state.formSuccess} </div>
+
                         <button onClick={(event)=> this.submitForm(event)}>Enroll</button>
+                        <div className={"enroll_discl"}>
+                            ©2019-2020 Meme Groups™ is a trademark of Existential Crisis Inc.All Rights Reserved.
+                            Product name,logo,brands and other trademarks featured or referred to within are all ded.
+                        </div>
                         </div>
                     </form>
                 </div>
